@@ -5,11 +5,13 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from datetime import datetime, timedelta
 
-TOKEN = "7519329852:AAFfnsAii4abidtscFg84CeVVwM1pDovQ60"  # Вставьте токен от BotFather
+
 CHAT_ID = "625265901"  # Вставьте ваш chat_id (узнать через @userinfobot)
 
+TOKEN = os.getenv("BOT_TOKEN")  # Получаем токен из переменных окружения
+
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
 # Создаем базу данных
 conn = sqlite3.connect("birthdays.db")
@@ -140,3 +142,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+executor.start_polling(dp, skip_updates=True)
