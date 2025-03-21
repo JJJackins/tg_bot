@@ -142,10 +142,9 @@ async def check_birthdays():
 
 
 # Запуск бота
-async def main():
-    dp.startup.register(lambda _: asyncio.create_task(check_birthdays()))
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+async def on_start(dp):
+    logging.basicConfig(level=logging.INFO)
+    await dp.start_polling()
+    
+if __name__ == '__main__':
+    asyncio.run(on_start(dp))
