@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from datetime import datetime, timedelta
+from aiogram import executor
 
 
 CHAT_ID = "625265901"  # Вставьте ваш chat_id (узнать через @userinfobot)
