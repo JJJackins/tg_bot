@@ -1,10 +1,9 @@
-import sqlite3
-import os
-import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from datetime import datetime, timedelta
+import os
+import asyncio
 import logging
 
 # Получаем chat_id и токен из переменных окружения
@@ -16,7 +15,7 @@ if not TOKEN:
     raise ValueError("BOT_TOKEN не задан!")
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Используем SQLite, но в памяти (не сохраняется после перезагрузки)
 conn = sqlite3.connect(":memory:")
@@ -50,24 +49,20 @@ menu_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="❌ Удалить ДР"), KeyboardButton(text="🔔 Настроить напоминание")],
 ], resize_keyboard=True)
 
-
 # Команда /start
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
     await message.answer("Привет! Я помогу запоминать дни рождения. Выберите действие в меню:", reply_markup=menu_keyboard)
-
 
 # Команда /menu – повторное вызовы меню
 @dp.message(Command("menu"))
 async def show_menu(message: types.Message):
     await message.answer("Выберите действие:", reply_markup=menu_keyboard)
 
-
 # Добавление дня рождения
 @dp.message(lambda message: message.text == "📅 Добавить ДР")
 async def add_birthday_prompt(message: types.Message):
     await message.answer("Введите ДР в формате: **Имя ДД.ММ.ГГГГ**")
-
 
 @dp.message(lambda message: len(message.text.split()) == 2 and "." in message.text)
 async def add_birthday(message: types.Message):
@@ -80,7 +75,6 @@ async def add_birthday(message: types.Message):
     except ValueError:
         await message.answer("⚠️ Неправильный формат! Введите **Имя ДД.ММ.ГГГГ**")
 
-
 # Список дней рождений
 @dp.message(lambda message: message.text == "📋 Список ДР")
 async def list_birthdays(message: types.Message):
@@ -92,12 +86,10 @@ async def list_birthdays(message: types.Message):
     text = "🎂 Дни рождения:\n" + "\n".join([f"{name} – {date}" for name, date in rows])
     await message.answer(text)
 
-
 # Удаление дня рождения
 @dp.message(lambda message: message.text == "❌ Удалить ДР")
 async def delete_birthday_prompt(message: types.Message):
     await message.answer("Введите имя, чей ДР удалить:")
-
 
 @dp.message(lambda message: len(message.text.split()) == 1)
 async def delete_birthday(message: types.Message):
@@ -106,12 +98,10 @@ async def delete_birthday(message: types.Message):
     conn.commit()
     await message.answer(f"🗑 День рождения {name} удален.")
 
-
 # Настройка напоминания
 @dp.message(lambda message: message.text == "🔔 Настроить напоминание")
 async def set_reminder_prompt(message: types.Message):
     await message.answer("Введите, за сколько дней до ДР напоминать (например: **3**):")
-
 
 @dp.message(lambda message: message.text.isdigit())
 async def set_reminder_days(message: types.Message):
@@ -119,7 +109,6 @@ async def set_reminder_days(message: types.Message):
     cursor.execute("UPDATE reminders SET days_before = ?", (days,))
     conn.commit()
     await message.answer(f"🔔 Теперь я буду напоминать за {days} дней до дня рождения!")
-
 
 # Проверка дней рождений и отправка уведомлений
 async def check_birthdays():
@@ -135,18 +124,16 @@ async def check_birthdays():
 
         for name, date in rows:
             bday = datetime.strptime(date, "%d.%m.%Y").replace(year=today.year)
-            if bday.date() == notify_date.date():  # Проверяем, совпадает ли день
+            if bday.date() == notify_date.date():
                 await bot.send_message(CHAT_ID, f"🎉 Через {days_before} дней день рождения у {name}!")
 
         await asyncio.sleep(86400)  # Проверяем раз в сутки
 
-
 # Запуск бота
 async def on_start(dp):
     logging.basicConfig(level=logging.INFO)
-    # Запускаем проверку дней рождений в фоновом режиме
-    asyncio.create_task(check_birthdays())
     await dp.start_polling()
-    
+
 if __name__ == '__main__':
+    asyncio.create_task(check_birthdays())  # Добавляем фоновую задачу
     asyncio.run(on_start(dp))
