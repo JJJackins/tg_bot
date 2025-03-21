@@ -142,3 +142,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+executor.start_polling(dp, skip_updates=True)
