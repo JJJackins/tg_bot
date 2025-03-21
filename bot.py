@@ -1,9 +1,10 @@
+import sqlite3
+import os
+import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from datetime import datetime, timedelta
-import os
-import asyncio
 import logging
 
 # Получаем chat_id и токен из переменных окружения
@@ -18,7 +19,7 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 # Используем SQLite, но в памяти (не сохраняется после перезагрузки)
-conn = sqlite3.connect(":memory:")
+conn = sqlite3.connect(":memory:")  # Теперь SQLite импортирован
 cursor = conn.cursor()
 
 # Создаем таблицы в памяти
