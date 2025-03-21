@@ -16,7 +16,7 @@ if not TOKEN:
     raise ValueError("BOT_TOKEN не задан!")
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)  # Передаем bot сюда
 
 # Используем SQLite, но в памяти (не сохраняется после перезагрузки)
 conn = sqlite3.connect(":memory:")  # Теперь SQLite импортирован
