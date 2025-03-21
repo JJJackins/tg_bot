@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from datetime import datetime, timedelta
-from aiogram import executor
+import logging
 
 # Получаем chat_id и токен из переменных окружения
 CHAT_ID = os.getenv("CHAT_ID", "625265901")  # Вставьте ваш chat_id, если не используете переменные окружения
@@ -144,6 +144,8 @@ async def check_birthdays():
 # Запуск бота
 async def on_start(dp):
     logging.basicConfig(level=logging.INFO)
+    # Запускаем проверку дней рождений в фоновом режиме
+    asyncio.create_task(check_birthdays())
     await dp.start_polling()
     
 if __name__ == '__main__':
