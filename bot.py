@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import logging
 
 # Получаем chat_id и токен из переменных окружения
-CHAT_ID = os.getenv("CHAT_ID", "625265901")  # Вставьте ваш chat_id, если не используете переменные окружения
+CHAT_ID = os.getenv("CHAT_ID")  # Вставьте ваш chat_id, если не используете переменные окружения
 TOKEN = os.getenv("BOT_TOKEN")  # Токен бота из переменных окружения
 
 # Проверка, что токен существует
