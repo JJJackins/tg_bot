@@ -131,10 +131,14 @@ async def check_birthdays():
         await asyncio.sleep(86400)  # Проверяем раз в сутки
 
 # Запуск бота
-async def on_start(dp):
+async def main():
     logging.basicConfig(level=logging.INFO)
-    await dp.start_polling()
+    # Запуск бота и фоновая задача
+    await asyncio.gather(
+        dp.start_polling(),
+        check_birthdays()  # Запуск фоновой задачи для проверки дней рождений
+    )
 
 if __name__ == '__main__':
-    asyncio.create_task(check_birthdays())  # Добавляем фоновую задачу
-    asyncio.run(on_start(dp))
+    # Запускаем главный цикл событий
+    asyncio.run(main())
