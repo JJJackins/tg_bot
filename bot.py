@@ -1,4 +1,5 @@
 import sqlite3
+import os
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
@@ -6,17 +7,22 @@ from aiogram.filters import Command
 from datetime import datetime, timedelta
 from aiogram import executor
 
+# Получаем chat_id и токен из переменных окружения
+CHAT_ID = os.getenv("CHAT_ID", "625265901")  # Вставьте ваш chat_id, если не используете переменные окружения
+TOKEN = os.getenv("BOT_TOKEN")  # Токен бота из переменных окружения
 
-CHAT_ID = "625265901"  # Вставьте ваш chat_id (узнать через @userinfobot)
-
-TOKEN = os.getenv("BOT_TOKEN")  # Получаем токен из переменных окружения
+# Проверка, что токен существует
+if not TOKEN:
+    raise ValueError("BOT_TOKEN не задан!")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-# Создаем базу данных
-conn = sqlite3.connect("birthdays.db")
+# Используем SQLite, но в памяти (не сохраняется после перезагрузки)
+conn = sqlite3.connect(":memory:")
 cursor = conn.cursor()
+
+# Создаем таблицы в памяти
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS birthdays (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +38,7 @@ cursor.execute("""
 """)
 conn.commit()
 
-# Устанавливаем стандартное значение напоминания (если не задано)
+# Устанавливаем стандартное значение напоминания, если оно не задано
 cursor.execute("SELECT COUNT(*) FROM reminders")
 if cursor.fetchone()[0] == 0:
     cursor.execute("INSERT INTO reminders (days_before) VALUES (1)")
@@ -143,5 +149,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-executor.start_polling(dp, skip_updates=True)
