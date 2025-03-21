@@ -15,8 +15,8 @@ TOKEN = os.getenv("BOT_TOKEN")  # Токен бота из переменных 
 if not TOKEN:
     raise ValueError("BOT_TOKEN не задан!")
 
-bot = Bot(token=TOKEN)
-dp = Dispatcher(bot=bot)  # Передаем bot через ключевое слово
+bot = Bot(token=TOKEN)  # Инициализация бота
+dp = Dispatcher(bot)  # Инициализация диспетчера с использованием bot
 
 # Используем SQLite, но в памяти (не сохраняется после перезагрузки)
 conn = sqlite3.connect(":memory:")  # Теперь SQLite импортирован
@@ -134,10 +134,8 @@ async def check_birthdays():
 async def main():
     logging.basicConfig(level=logging.INFO)
     # Запуск бота и фоновая задача
-    await asyncio.gather(
-        dp.start_polling(),
-        check_birthdays()  # Запуск фоновой задачи для проверки дней рождений
-    )
+    await dp.start_polling()  # Начало опроса
+    await check_birthdays()  # Запуск фоновой задачи для проверки дней рождений
 
 if __name__ == '__main__':
     # Запускаем главный цикл событий
